@@ -1,0 +1,25 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="io.flutter.plugins.firebase.installations.firebase_app_installations" >
+4
+5    <uses-sdk
+6        android:minSdkVersion="19"
+6-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml
+7        android:targetSdkVersion="19" />
+7-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml
+8
+9    <application>
+9-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml:3:3-8:17
+10        <service android:name="com.google.firebase.components.ComponentDiscoveryService" >
+10-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml:4:5-7:15
+10-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml:4:14-85
+11            <meta-data
+11-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml:5:7-6:77
+12                android:name="com.google.firebase.components:io.flutter.plugins.firebase.installations.firebase_app_installations.FlutterFirebaseAppRegistrar"
+12-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml:5:18-160
+13                android:value="com.google.firebase.components.ComponentRegistrar" />
+13-->/Users/yoosunu/.pub-cache/hosted/pub.dev/firebase_app_installations-0.2.5+4/android/src/main/AndroidManifest.xml:6:9-74
+14        </service>
+15    </application>
+16
+17</manifest>
