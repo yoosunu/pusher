@@ -1,360 +1,179 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
+// import 'package:flutter/material.dart';
+// // import 'pages/home.dart';
+// import 'pages/push.dart';
+// import 'pages/database.dart';
+// import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'firebase_options.dart';
+// import 'package:permission_handler/permission_handler.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // import 'package:http/http.dart' as http;
 // import 'package:html/parser.dart' as parser;
-import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:workmanager/workmanager.dart';
 
-class DataBasePage extends StatefulWidget {
-  const DataBasePage({super.key, required this.title});
+// FirebaseDatabase database = FirebaseDatabase.instance;
+// dynamic codes = [];
+// dynamic titles = [];
+// dynamic links = [];
 
-  final String title;
+// Future<void> fetchData() async {
+//   var url = Uri.parse('https://www.jbnu.ac.kr/kor/?menuID=139');
+//   var url2 = Uri.parse('https://www.jbnu.ac.kr/kor/?menuID=139&pno=2');
+//   var response = await http.get(url);
+//   var response2 = await http.get(url2);
 
-  @override
-  State<DataBasePage> createState() => _DataBasePageState();
-}
+//   if (response.statusCode == 200) {
+//     // page 1
+//     var document = parser.parse(response.body);
+//     var noticesPage1 = document.getElementsByTagName('tr');
 
-class _DataBasePageState extends State<DataBasePage> {
-  // for reading from DB section
-  late dynamic codesGet = [];
-  late dynamic titlesGet = [];
-  late dynamic linksGet = [];
-  late dynamic maxCode = 0;
+//     for (var noticePage1 in noticesPage1) {
+//       var mnoms = noticePage1.getElementsByClassName('mnom');
+//       var anchors = noticePage1.getElementsByTagName('a');
 
-  // signup section
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final TextEditingController _emailController2 = TextEditingController();
-  final TextEditingController _passwordController2 = TextEditingController();
+//       for (var i = 0; i < mnoms.length; i++) {
+//         var mnom = mnoms[i];
+//         var anchor = anchors[i];
+//         if (mnom.text.isNotEmpty) {
+//           codes.add(mnom.text);
+//           titles.add(anchor.text);
+//           links.add(anchor.attributes['href']);
+//         }
+//       }
+//     }
 
-  // realtime database config
-  FirebaseDatabase database = FirebaseDatabase.instance;
+//     // // page 2
+//     var document2 = parser.parse(response2.body);
+//     var noticesPage2 = document2.getElementsByTagName('tr');
 
-  void getData() async {
-    DataSnapshot snapshotMaxCode =
-        await database.ref("info").child("codeMax").get();
-    DataSnapshot snapshotCodesGet =
-        await database.ref("info").child("codes").get();
-    DataSnapshot snapshotTitlesGet =
-        await database.ref("info").child("titles").get();
-    DataSnapshot snapshotLinksGet =
-        await database.ref("info").child("links").get();
+//     for (var noticePage2 in noticesPage2) {
+//       var mnoms = noticePage2.getElementsByClassName('mnom');
+//       var anchors = noticePage2.getElementsByTagName('a');
+//       for (var i = 0; i < mnoms.length; i++) {
+//         var mnom = mnoms[i];
+//         var anchor = anchors[i];
+//         if (mnom.text.isNotEmpty) {
+//           codes.add(mnom.text);
+//           titles.add(anchor.text);
+//           links.add(anchor.attributes['href']);
+//         }
+//       }
+//     }
+//   }
+// }
 
-    setState(() {
-      maxCode = snapshotMaxCode.value;
-      codesGet = snapshotCodesGet.value;
-      titlesGet = snapshotTitlesGet.value;
-      linksGet = snapshotLinksGet.value;
-    });
-    FirebaseDatabase.instance.setPersistenceEnabled(true);
-  }
+// void updateData() async {
+//   print("Updating data...");
+//   try {
+//     await database.ref().child("info").update({
+//       "codes": codes,
+//       "titles": titles,
+//       "links": links,
+//       "codeMax": codes.first,
+//       "test": 1
+//     });
+//   } catch (e) {
+//     print("Error updating data: $e");
+//   }
 
-  @override
-  void initState() {
-    super.initState();
-    final codesRef = FirebaseDatabase.instance.ref("info").child("codes");
-    codesRef.keepSynced(true);
-    final titlesRef = FirebaseDatabase.instance.ref("info").child("titles");
-    titlesRef.keepSynced(true);
-    final linksRef = FirebaseDatabase.instance.ref("info").child("links");
-    linksRef.keepSynced(true);
-    final codeMaxRef = FirebaseDatabase.instance.ref("info").child("codeMax");
-    codeMaxRef.keepSynced(true);
+//   FirebaseDatabase.instance.setPersistenceEnabled(true);
+// }
 
-    // Workmanager().initialize(callbackDispatcher);
-    // schedulePeriodicTask();
-    renderData();
-  }
+// @pragma('vm:entry-point')
+// void callbackDispatcher() async {
+//   Workmanager().executeTask((task, inputData) async {
+//     await fetchData();
+//     updateData();
+//     print("workmanager init!");
+//     return Future.value(true);
+//   });
+// }
 
-  Future<void> renderData() async {
-    setState(() {
-      getData();
-    });
-  }
+// void schedulePeriodicTask() {
+//   Workmanager().registerPeriodicTask(
+//     "periodicTask",
+//     "periodicTaskTag",
+//     frequency: const Duration(seconds: 10),
+//     inputData: <String, dynamic>{},
+//   );
+// }
 
-  // signup section
-  Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController2.text,
-        password: _passwordController2.text,
-      );
-      print('User signed up: ${userCredential.user}');
-      _emailController2.clear();
-      _passwordController2.clear();
-      // 회원가입 성공 시 다음 화면으로 이동하거나 필요한 작업을 수행합니다.
-    } on FirebaseAuthException catch (e) {
-      print('Failed to sign up: $e');
-      // 회원가입 실패 시 사용자에게 적절한 오류 메시지를 표시합니다.
-    }
-  }
+// // background section
 
-  //popup for registering
-  void registerPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(
-            child: Text(
-              "Register Section",
-              textAlign: TextAlign.justify,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          content: SizedBox(
-            height: 300,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-                  child: SizedBox(
-                    width: 200,
-                    child: TextField(
-                      controller: _emailController2,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Email',
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
-                  child: SizedBox(
-                    width: 200,
-                    child: TextField(
-                      controller: _passwordController2,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Password',
-                      ),
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _signUpWithEmailAndPassword(context);
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Submit"),
-                ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(0, 23, 0, 0),
-                  child:
-                      const Text("!! You can see notifications\nafter sign up"),
-                )
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Close"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+// @pragma('vm:entry-point')
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   print("Handling a background message: ${message.messageId}");
+// }
 
-  //Popup for info of notifications
-  void showPopup(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Text(
-              "${titlesGet[index]}",
-              textAlign: TextAlign.justify,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          content: ElevatedButton(
-            onPressed: () {},
-            child: InkWell(
-              onTap: () async {
-                final Uri url = Uri.parse(
-                    'https://www.jbnu.ac.kr/kor/' '${linksGet[index]}');
-                if (await canLaunchUrl(url)) {
-                  await launchUrl(url);
-                } else {
-                  throw 'Could not launch'
-                      'https://www.jbnu.ac.kr/kor/'
-                      '${linksGet[index]}';
-                }
-              },
-              child: const Text(
-                'Go to site to check!',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Close"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        leading: null,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                10,
-                10,
-                10,
-                0,
-              ),
-              child: SizedBox(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(250, 50)),
-                  onPressed: () {},
-                  child: const Text(
-                    "Get the Notification!",
-                    style: TextStyle(
-                      fontSize: 22,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                color: Colors.white10,
-                padding: const EdgeInsets.fromLTRB(
-                  10,
-                  10,
-                  10,
-                  0,
-                ),
-                alignment: Alignment.center,
-                child: ListView.builder(
-                    itemCount: codesGet.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        padding: const EdgeInsets.all(10),
-                        alignment: Alignment.center,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(100, 55),
-                            alignment: Alignment.center,
-                          ),
-                          onPressed: () {
-                            showPopup(context, index);
-                          },
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${codesGet[index]}',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                Expanded(
-                                    child: Text(
-                                  '${titlesGet[index]}',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ))
-                              ]),
-                        ),
-                      );
-                    }),
-              ),
-            ),
-            Container(
-              decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 246, 201, 216),
-                  border: Border(
-                      top: BorderSide(
-                    color: Colors.black,
-                    width: 0.5,
-                  ))),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  0,
-                  10,
-                  10,
-                  10,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 150,
-                      height: 70,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[200],
-                          side: const BorderSide(
-                              color: Color.fromARGB(255, 232, 147, 141),
-                              width: 2),
-                          elevation: 5,
-                          shadowColor: Colors.black.withOpacity(1),
-                        ),
-                        onPressed: () {},
-                        child: Text(
-                          "$maxCode",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          registerPopup(context);
-        },
-        tooltip: 'Fetch',
-        child: const Icon(Icons.person_add),
-      ),
-    );
-  }
-}
+//   Workmanager().initialize(callbackDispatcher);
+//   schedulePeriodicTask();
+
+//   // ignore: unused_local_variable
+//   final fcmToken = await FirebaseMessaging.instance.getToken();
+//   FirebaseMessaging.instance.requestPermission(
+//     badge: true,
+//     alert: true,
+//     sound: true,
+//   );
+//   if (await Permission.notification.isDenied) {
+//     await Permission.notification.request();
+//   }
+
+//   // making channel high priority
+//   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//       FlutterLocalNotificationsPlugin();
+
+//   const AndroidNotificationChannel channel = AndroidNotificationChannel(
+//     'high_priority_Channel',
+//     'High Priority Notifications',
+//     importance: Importance.high,
+//   );
+
+//   await flutterLocalNotificationsPlugin
+//       .resolvePlatformSpecificImplementation<
+//           AndroidFlutterLocalNotificationsPlugin>()
+//       ?.createNotificationChannel(channel);
+
+//   // foreground section
+//   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+//     alert: true,
+//     badge: true,
+//     sound: true,
+//   );
+//   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: 'Flutter Demo',
+//       theme: ThemeData(
+//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+//         useMaterial3: true,
+//       ),
+//       home: const DataBasePage(
+//         title: 'Pusher',
+//       ),
+//       routes: <String, WidgetBuilder>{
+//         '/push': (BuildContext context) =>
+//             const PusherPage(title: 'Pusher Page'),
+//         '/db': (BuildContext context) =>
+//             const DataBasePage(title: 'Building...'),
+//         // '/c': (BuildContext context) => const MyPage(title: Text('page C')),
+//       },
+//     );
+//   }
+// }
