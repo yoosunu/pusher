@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pusher/sqldbinit.dart';
+import 'push.dart';
 
 class sqlDBPage extends StatefulWidget {
   const sqlDBPage({super.key, required this.title});
@@ -80,6 +81,19 @@ class _sqlDBPageState extends State<sqlDBPage> {
               ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await dbHelper.saveNotification({
+                  DatabaseHelper.secondColumnCode: codesGet[index],
+                  DatabaseHelper.secondColumnTitle: titlesGet[index],
+                  DatabaseHelper.secondColumnLink: linksGet[index],
+                  DatabaseHelper.secondColumnTimeStamp: timeStampGet[index],
+                });
+              },
+              child: const Text('Save'),
+            ),
+          ],
         );
       },
     );
@@ -93,8 +107,8 @@ class _sqlDBPageState extends State<sqlDBPage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-            onPressed: () {
-              dbHelper.resetTable();
+            onPressed: () async {
+              await dbHelper.resetTable();
             },
             icon: const Icon(Icons.delete),
           ),
@@ -173,11 +187,15 @@ class _sqlDBPageState extends State<sqlDBPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await _loadData();
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const PusherPage(title: "Saved")),
+          );
         },
         tooltip: 'Fetch',
-        child: const Icon(Icons.refresh),
+        child: const Icon(Icons.save_alt),
       ),
     );
   }

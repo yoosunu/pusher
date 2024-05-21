@@ -36,7 +36,7 @@ class FetchUtil {
           if (mnom.text.isNotEmpty) {
             int mnonInt = int.parse(mnom.text);
             codes.add(mnonInt);
-            titles.add(anchor.text);
+            titles.add(anchor.text.trim());
             links.add(anchor.attributes['href']);
             times.add(formattedTime);
           }
@@ -56,7 +56,7 @@ class FetchUtil {
           if (mnom.text.isNotEmpty) {
             int mnonInt = int.parse(mnom.text);
             codes.add(mnonInt);
-            titles.add(anchor.text);
+            titles.add(anchor.text.trim());
             links.add(anchor.attributes['href']);
             times.add(formattedTime);
           }
@@ -76,7 +76,7 @@ class FetchUtil {
           if (mnom.text.isNotEmpty) {
             int mnonInt = int.parse(mnom.text);
             codes.add(mnonInt);
-            titles.add(anchor.text);
+            titles.add(anchor.text.trim());
             links.add(anchor.attributes['href']);
             times.add(formattedTime);
           }
