@@ -15,8 +15,6 @@
             android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingService"
             android:exported="false">
         </service>
-        <meta-data
-            android:value="high_importance_channel" />    
         <activity   
             android:name=".MainActivity"
             android:exported="true"

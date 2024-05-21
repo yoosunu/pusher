@@ -42,6 +42,10 @@ class _PusherPageState extends State<PusherPage> {
           IconButton(
             onPressed: () async {
               await dbHelper.resetStoredTable();
+              setState(() {
+                _isLoading = true;
+                getData();
+              });
             },
             icon: const Icon(Icons.delete),
           ),
@@ -105,16 +109,11 @@ class _PusherPageState extends State<PusherPage> {
                     },
                   ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _isLoading = true;
-          });
-          getData();
-        },
-        tooltip: 'Refresh',
-        child: const Icon(Icons.refresh),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {},
+      //   tooltip: 'Refresh',
+      //   child: const Icon(Icons.refresh),
+      // ),
     );
   }
 }
