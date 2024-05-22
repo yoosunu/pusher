@@ -1,11 +1,11 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, use_build_context_synchronously
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pusher/sqldbinit.dart';
-import 'push.dart';
+import 'save.dart';
 
 class sqlDBPage extends StatefulWidget {
   const sqlDBPage({super.key, required this.title});
@@ -64,35 +64,57 @@ class _sqlDBPageState extends State<sqlDBPage> {
               ),
             ),
           ),
-          content: ElevatedButton(
-            onPressed: () async {
-              final Uri url =
-                  Uri.parse('https://www.jbnu.ac.kr/kor/${linksGet[index]}');
-              if (await canLaunchUrl(url)) {
-                await launchUrl(url);
-              } else {
-                throw 'Could not launch https://www.jbnu.ac.kr/kor/${linksGet[index]}';
-              }
-            },
-            child: const Text(
-              'Go to site to check!',
-              style: TextStyle(
-                fontSize: 18,
+          content: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+            child: ElevatedButton(
+              onPressed: () async {
+                final Uri url =
+                    Uri.parse('https://www.jbnu.ac.kr/kor/${linksGet[index]}');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
+                } else {
+                  throw 'Could not launch https://www.jbnu.ac.kr/kor/${linksGet[index]}';
+                }
+              },
+              child: const Text(
+                'Go to site to check!',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
               ),
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () async {
-                await dbHelper.saveNotification({
-                  DatabaseHelper.secondColumnCode: codesGet[index],
-                  DatabaseHelper.secondColumnTitle: titlesGet[index],
-                  DatabaseHelper.secondColumnLink: linksGet[index],
-                  DatabaseHelper.secondColumnTimeStamp: timeStampGet[index],
-                });
-              },
-              child: const Text('Save'),
-            ),
+            Material(
+              elevation: 2,
+              shadowColor: Colors.black,
+              borderRadius: BorderRadius.circular(25),
+              child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
+                onPressed: () async {
+                  await dbHelper.saveNotification({
+                    DatabaseHelper.secondColumnCode: codesGet[index],
+                    DatabaseHelper.secondColumnTitle: titlesGet[index],
+                    DatabaseHelper.secondColumnLink: linksGet[index],
+                    DatabaseHelper.secondColumnTimeStamp: timeStampGet[index],
+                  });
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Notice has been saved'),
+                      action: SnackBarAction(
+                        label: 'OK',
+                        onPressed: () {},
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Save'),
+              ),
+            )
           ],
         );
       },
@@ -107,8 +129,18 @@ class _sqlDBPageState extends State<sqlDBPage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-            onPressed: () async {
-              await dbHelper.resetTable();
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Clear database?'),
+                  action: SnackBarAction(
+                    label: 'CLEAR',
+                    onPressed: () async {
+                      await dbHelper.resetTable();
+                    },
+                  ),
+                ),
+              );
             },
             icon: const Icon(Icons.delete),
           ),
