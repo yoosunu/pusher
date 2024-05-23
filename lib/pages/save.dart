@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pusher/sqldbinit.dart';
@@ -122,14 +124,23 @@ class _PusherPageState extends State<PusherPage> {
                                           ListTile(
                                             leading: const Icon(Icons.delete),
                                             title: const Text('Delete'),
-                                            onTap: () {
+                                            onTap: () async {
+                                              await dbHelper.deleteNotification(
+                                                  item[DatabaseHelper
+                                                      .secondColumnCode]);
+                                              setState(() {
+                                                getData();
+                                              });
                                               Navigator.of(context).pop();
-                                              SnackBar(
-                                                content: const Text(
-                                                    'Delete all notices?'),
-                                                action: SnackBarAction(
-                                                  label: 'DELETE',
-                                                  onPressed: () {},
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: const Text(
+                                                      'Notice was deleted'),
+                                                  action: SnackBarAction(
+                                                    label: 'ok',
+                                                    onPressed: () {},
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -141,7 +152,7 @@ class _PusherPageState extends State<PusherPage> {
                                 );
                               },
                               style: ButtonStyle(
-                                  shape: MaterialStateProperty.all(
+                                  shape: WidgetStateProperty.all(
                                       RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0),
                               ))),

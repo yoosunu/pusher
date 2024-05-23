@@ -112,6 +112,15 @@ class DatabaseHelper {
     return await db.insert(secondTableName, info);
   }
 
+  Future<int> deleteNotification(int codeSaved) async {
+    Database db = await database;
+    return await db.delete(
+      secondTableName,
+      where: '$secondColumnCode = ?',
+      whereArgs: [codeSaved],
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getStoredData() async {
     Database db = await database;
     return db.query(secondTableName);
